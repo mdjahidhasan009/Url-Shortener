@@ -8,13 +8,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from '../adapters/strategies/jwt.strategy';
 import { LocalStrategy } from '../adapters/strategies/local.strategy';
 import { AuthController } from '../adapters/controllers/auth.controller';
+import { AuthUseCases } from '../../core/application/use-cases/auth.use-cases';
+import { JwtServiceAdapter } from '../adapters/jwt/jwt.service.adapter';
 
 @Module({
   imports: [
-    ConfigModule, // Ensure ConfigModule is imported
+    ConfigModule,
     TypeOrmModule.forFeature([UserEntity]),
     JwtModule.registerAsync({
-      imports: [ConfigModule], // Ensure ConfigModule is imported
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
@@ -26,9 +28,14 @@ import { AuthController } from '../adapters/controllers/auth.controller';
     AuthService,
     JwtStrategy,
     LocalStrategy,
+    AuthUseCases,
     {
       provide: 'UserRepositoryPort',
       useClass: UserRepository,
+    },
+    {
+      provide: 'JwtServicePort',
+      useClass: JwtServiceAdapter,
     },
   ],
   controllers: [AuthController],

@@ -1,43 +1,30 @@
-// src/infrastructure/services/auth.service.ts
-
-import { Injectable, Inject } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-import { UserRepositoryPort } from '../../core/application/ports/repository.port';
-import { UserEntity } from '../../core/domain/entities/user.entity';
+import { Injectable } from '@nestjs/common';
+import { AuthUseCases } from '../../core/application/use-cases/auth.use-cases';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @Inject('UserRepositoryPort')
-    private userRepository: UserRepositoryPort,
-    private jwtService: JwtService,
-  ) {}
+  constructor(private readonly authUseCases: AuthUseCases) {}
+
+  async register(
+    username: string,
+    password: string,
+  ): Promise<{ access_token: string }> {
+    return this.authUseCases.register(username, password);
+  }
+
+  async login(
+    username: string,
+    password: string,
+  ): Promise<{ access_token: string }> {
+    return this.authUseCases.login(username, password);
+  }
 
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.userRepository.findOneByUsername(username);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user; // Exclude password
-      return result;
+    try {
+      const result = await this.authUseCases.login(username, password);
+      return { username, access_token: result.access_token };
+    } catch (error) {
+      return null;
     }
-    return null;
-  }
-
-  async login(user: UserEntity) {
-    const payload = { username: user.username, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
-  }
-
-  async register(username: string, password: string): Promise<UserEntity> {
-    const existingUser = await this.userRepository.findOneByUsername(username);
-    if (existingUser) {
-      throw new Error('Username already exists');
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new UserEntity({ username, password: hashedPassword });
-    return this.userRepository.create(newUser);
   }
 }

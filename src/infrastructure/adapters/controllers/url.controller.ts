@@ -35,7 +35,6 @@ export class UrlController {
   ): Promise<void> {
     try {
       let longUrl = await this.urlUseCases.getUrl(shortUrlId);
-      console.log('finally longurl end', longUrl);
 
       // Ensure the URL has a protocol
       if (!longUrl.startsWith('http://') && !longUrl.startsWith('https://')) {
@@ -47,7 +46,6 @@ export class UrlController {
       res.status(HttpStatus.NOT_FOUND).send({ message: error.message });
     }
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Delete('/delete')
