@@ -1,5 +1,3 @@
-// src/infrastructure/adapters/cache/redis.cache.ts
-
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
@@ -18,7 +16,6 @@ export class RedisCacheAdapter implements CachePort {
       url: redisUrl,
     });
 
-    // Handle connection errors
     this.client.on('error', (err) => {
       this.logger.error('Redis Client Error', err);
     });
@@ -38,5 +35,9 @@ export class RedisCacheAdapter implements CachePort {
     } else {
       await this.client.set(key, value);
     }
+  }
+
+  async del(key: string): Promise<void> {
+    await this.client.del(key);
   }
 }

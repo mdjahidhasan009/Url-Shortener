@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { UserEntity } from './user.entity';
 
-@Entity()
+@Entity('urls')
 export class UrlEntity {
   @PrimaryColumn()
   shortUrlId: string;
@@ -10,6 +11,10 @@ export class UrlEntity {
 
   @Column()
   userId: string;
+
+  @ManyToOne(() => UserEntity, (user) => user.urls)
+  @JoinColumn({ name: 'userId' })
+  user: UserEntity;
 
   @Column()
   createdAt: Date;

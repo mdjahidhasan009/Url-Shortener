@@ -3,7 +3,7 @@ export class UrlEntity {
   longUrl: string;
   createdAt: Date;
   expiresAt?: Date;
-  userId: string;
+  userId: string; // Foreign key to UserEntity
   clicks: number;
   lastAccessed?: Date;
   metadata?: Record<string, any>;
