@@ -13,7 +13,10 @@ export class AuthUseCases {
     private readonly jwtService: JwtServicePort,
   ) {}
 
-  async register(username: string, password: string): Promise<{ access_token: string }> {
+  async register(
+    username: string,
+    password: string,
+  ): Promise<{ access_token: string }> {
     const existingUser = await this.userRepository.findOneByUsername(username);
     if (existingUser) {
       throw new Error('Username already exists');
@@ -29,7 +32,10 @@ export class AuthUseCases {
     return { access_token };
   }
 
-  async login(username: string, password: string): Promise<{ access_token: string }> {
+  async login(
+    username: string,
+    password: string,
+  ): Promise<{ access_token: string }> {
     const user = await this.userRepository.findOneByUsername(username);
     if (user && (await bcrypt.compare(password, user.password))) {
       const payload = { username: user.username, sub: user.id };
