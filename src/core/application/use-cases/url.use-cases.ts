@@ -26,7 +26,8 @@ export class UrlUseCases {
 
     // Check if the URL is present in the cache
     const cachedShortUrl = await this.cache.get(longUrl);
-    if (cachedShortUrl) return cachedShortUrl;
+    if (cachedShortUrl)
+      return `${process.env.BACKEND_DOMAIN}/url/${cachedShortUrl}`;
 
     const shortUrlId = await this.hashService.generateUniqueHash(longUrl);
 
